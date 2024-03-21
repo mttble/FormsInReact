@@ -8,7 +8,11 @@ type FormFields = {
 
 const App = () =>{
   
-  const {register, handleSubmit } = useForm<FormFields>()
+  const {
+    register, 
+    handleSubmit, 
+    formState: {errors}, 
+  } = useForm<FormFields>()
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     console.log(data)
@@ -16,19 +20,31 @@ const App = () =>{
 
   return (
     <form className='tutorial gap-2' onSubmit={handleSubmit(onSubmit)}>
-
       <div>
         <input {...register("email", {
-          required:true,
-          pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-          })} type='text' placeholder='Email' />
+          required:"Email is required", //this was boolean 'true' but can also accept a string which will act as validation message at errors.email.message
+          validate: (value) => {
+            if (!value.includes('@')) {
+              return 'Email should contain @'
+            }
+            return true
+          },
+          })} 
+          type='text' 
+          placeholder='Email' 
+          />
+          {errors.email && (<div className="formValidateMessage" style={{color: 'red'}}>{errors.email.message}</div>)}
       </div>
 
       <div>
         <input {...register("password", {
-          required:true,
-          minLength: 8,
+          required:"Password is required",
+          minLength: {
+            value: 8,
+            message: 'Password should be at least 8 characters'
+          },
           })} type='password' placeholder='Password' />
+          {errors.password && (<div className="formValidateMessage" style={{color: 'red'}}>{errors.password.message}</div>)}
       </div>
 
       <div>
